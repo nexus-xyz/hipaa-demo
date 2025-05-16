@@ -1,0 +1,17 @@
+[package]
+name = "hipaa"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+guest = { path = "./src/guest" }
+csv-core = "0.1.12"
+nexus-sdk = { git = "https://github.com/nexus-xyz/nexus-zkvm.git", tag = "0.3.0", version = "0.3.0" }
+uuid = "1.16.0"
+
+[workspace]
+members = [
+    "src/guest"
+]
+
+
