@@ -1,14 +1,13 @@
 #![cfg_attr(target_arch = "riscv32", no_std, no_main)]
-#![feature(alloc)]
 
 extern crate alloc;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 use alloc::string::ToString;
-use serde::{Serialize, Deserialize};
+use serde::Serialize;
 use uuid::Uuid;
-use common::Record;
+use guest::common::Record;
 
 // Structure to hold the parsed record data
 #[derive(Debug, Serialize)]
@@ -144,26 +143,26 @@ fn main(records: Vec<Record>, uuids: Vec<Uuid>) -> Vec<Record> {
 
     let mut deidentified_records: Vec<Record> = Vec::new();
     let mut failed_records = 0;
-    
+
     // Process each record
     for (i, record) in records.into_iter().enumerate() {
         if let Some(mut patient_record) = PatientRecord::from_record(&record, &uuids[i]) {
-            apply_hipaa_deidentification(&mut patient_record);
-            
-            // Print the deidentified record as JSON
+            // Print the identified record as JSON
             if let Ok(json) = serde_json::to_string(&patient_record) {
                 nexus_rt::print!("Deidentified record: {}\n", json);
             }
             
+            apply_hipaa_deidentification(&mut patient_record);
+
             deidentified_records.push(patient_record.to_record());
         } else {
             failed_records += 1;
         }
     }
-    
+
     // Print the number of failed records
     nexus_rt::print!("Failed to process {} records\n", failed_records);
-    
+
     // Return the deidentified records
     deidentified_records
 }
